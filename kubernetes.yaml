@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-appxx
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-appxx
+  template:
+    metadata:
+      labels:
+        app: my-appxx
+    spec:
+      containers:
+        - name: my-appxx
+          image: my-appxx:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: '1'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-appxx-balancer
+spec:
+  selector:
+    app: my-appxx
+  ports:
+    - protocol: TCP
+      port: 8000 # The port to expose to the outside
+      targetPort: 8080 # The port the application is running on in the pods
+  type: LoadBalancer
+  sessionAffinity: ClientIP
